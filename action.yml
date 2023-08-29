@@ -1,0 +1,46 @@
+
+name: "Invoke Library-Dependent PowerShell"
+description: "Invokes the given PowerShell command after first restoring nested dependencies."
+inputs:
+  lib:
+    description: "The path of the library folder that nested dependencies are restored into when the restore script runs."
+    required: true
+    default: lib
+  nuget_config:
+    description: "The path of the NuGet.config file that the restore script uses to configure NuGet."
+    required: true
+    default: NuGet.PSGallery.config
+  packages_config:
+    description: "The path of the packages.config file that the restore script uses to determine which nested dependencies to restore."
+    required: true
+    default: packages.PSGallery.config
+  restore_run:
+    description: "The command to invoke the restore script that restores nested dependencies."
+    required: true
+    default: ./build/restore.ps1
+  run:
+    description: "The command to run after the nested dependencies have been restored."
+    required: true
+runs:
+  using: "composite"
+  steps:
+  - name: "Cache: Nested PSGallery Modules"
+    id: cacher
+    uses: actions/cache@v3
+    with:
+      path: ${{ inputs.lib }}
+      key: ${{ inputs.lib }}-PSGallery-${{ hashFiles('${{ inputs.nuget_config }}', '${{ inputs.packages_config }}') }}
+  - name: Install NuGet
+    uses: nuget/setup-nuget@v1.2.0
+    if: steps.cacher.outputs.cache-hit != 'true'
+    with:
+      nuget-version: '6.x'
+  - name: Restore Nested PSGallery Modules
+    if: steps.cacher.outputs.cache-hit != 'true'
+    shell: pwsh
+    run: |
+      Set-PSRepository PSGallery -InstallationPolicy Trusted
+      ${{ inputs.restore_run }}
+  - name: Execute Dependent Command
+    shell: pwsh
+    run: ${{ inputs.run }}
