@@ -24,7 +24,7 @@ jobs:
       shell: pwsh
       run: dotnet tool install --global GitVersion.Tool --version 5.12
     - name: Check out repository full history
-      uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4
+      uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
       with:
         fetch-depth: 0  # GitVersion requires the full history to calculate the version.
     - name: Show GitVersion configuration
@@ -58,7 +58,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Check out repository full history
-      uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4
+      uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
       with:
         fetch-depth: 0  # create-release-notes requires the full history to create the release notes.
     - name: "Get artifact: version-json"
