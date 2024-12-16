@@ -44,7 +44,7 @@ jobs:
         shell: pwsh
         run: Expand-Archive -Path "version-json.zip" -DestinationPath ./version-json/
       - name: Upload version-json
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: version-json
           path: ./version-json/version.json
@@ -53,7 +53,7 @@ jobs:
         shell: pwsh
         run: Expand-Archive -Path "release-notes.zip" -DestinationPath ./release-notes/
       - name: Upload release-notes
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: release-notes
           path: ./release-notes/release-notes.md
@@ -65,9 +65,9 @@ jobs:
     needs: [begin-release]
     steps:
     - name: Check out repository code
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      uses: actions/checkout@v4
     - name: "Get artifact: version-json"
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: version-json
         path: ./out/
@@ -80,13 +80,13 @@ jobs:
           echo "::set-output name=$key::$($version.$key)"
         }
     - name: "Get artifact: release-notes"
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: release-notes
         path: ./out/
     - name: Publish GitHub release
       id: publish_github_release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2.2.0
       with:
         token: "${{ secrets.RELEASE_GITHUB_TOKEN }}"
         name: "v${{ steps.gitversion_vars.outputs.SemVer }}"
