@@ -9,11 +9,11 @@ inputs:
   nuget_config:
     description: "The path of the NuGet.config file that the restore script uses to configure NuGet."
     required: true
-    default: NuGet.PSGallery.config
+    default: ./NuGet.PSGallery.config
   packages_config:
     description: "The path of the packages.config file that the restore script uses to determine which nested dependencies to restore."
     required: true
-    default: packages.PSGallery.config
+    default: ./packages.PSGallery.config
   restore_run:
     description: "The command to invoke the restore script that restores nested dependencies."
     required: true
@@ -36,7 +36,7 @@ runs:
     with:
       nuget-version: '6.x'
 
-  # set NUGET_PACKAGES to ~/.nuget/packages for non-Windows *only*
+  # set NUGET_PACKAGES to ${{ github.workspace }}/.nuget/packages for non-Windows *only*
   - name: Restore Nested PSGallery Modules
     if: steps.cacher.outputs.cache-hit != 'true' && runner.os != 'Windows'
     shell: pwsh
@@ -44,7 +44,7 @@ runs:
       Set-PSRepository PSGallery -InstallationPolicy Trusted
       ${{ inputs.restore_run }}
     env:
-      NUGET_PACKAGES: ~/.nuget/packages
+      NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
   - name: Restore Nested PSGallery Modules
     if: steps.cacher.outputs.cache-hit != 'true' && runner.os == 'Windows'
     shell: pwsh
