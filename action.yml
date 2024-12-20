@@ -35,12 +35,23 @@ runs:
     if: steps.cacher.outputs.cache-hit != 'true'
     with:
       nuget-version: '6.x'
+
+  # set NUGET_PACKAGES to ~/.nuget/packages for non-Windows *only*
   - name: Restore Nested PSGallery Modules
-    if: steps.cacher.outputs.cache-hit != 'true'
+    if: steps.cacher.outputs.cache-hit != 'true' && runner.os != 'Windows'
     shell: pwsh
     run: |
       Set-PSRepository PSGallery -InstallationPolicy Trusted
       ${{ inputs.restore_run }}
+    env:
+      NUGET_PACKAGES: ~/.nuget/packages
+  - name: Restore Nested PSGallery Modules
+    if: steps.cacher.outputs.cache-hit != 'true' && runner.os == 'Windows'
+    shell: pwsh
+    run: |
+      Set-PSRepository PSGallery -InstallationPolicy Trusted
+      ${{ inputs.restore_run }}
+
   - name: Execute Dependent Command
     shell: pwsh
     run: ${{ inputs.run }}
